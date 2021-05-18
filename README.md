@@ -1,0 +1,3 @@
+### Dependencies
+- glfw
+- glad
