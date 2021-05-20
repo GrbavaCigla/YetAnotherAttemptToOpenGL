@@ -15,6 +15,7 @@ pkg_check_modules(GLFW REQUIRED glfw3)
 pkg_check_modules(SPDLOG REQUIRED spdlog)
 
 add_compile_definitions(SPDLOG_FMT_EXTERNAL)
+add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 
 include_directories(include)
 include_directories(${GLFW_INCLUDEDIR})

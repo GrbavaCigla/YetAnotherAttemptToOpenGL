@@ -1,4 +1,5 @@
 #include <ciglagl/shader.h>
+#include <spdlog/spdlog.h>
 
 #define COMPILE_ERROR_BUFFER_SIZE 1024
 
@@ -71,13 +72,13 @@ void Shader::CompileMessages(GLuint shader, CompileType type) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
     }
 
-    if (compiled != GL_TRUE) {
-        GLsizei logLength = 0;
+    if (compiled == GL_FALSE) {
         GLchar message[COMPILE_ERROR_BUFFER_SIZE];
-        if (type == PROGRAM)
-            glGetProgramInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, &logLength, message);
-        else
-            glGetShaderInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, &logLength, message);
+        if (type == PROGRAM) {
+            glGetProgramInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, NULL, message);
+        } else {
+            glGetShaderInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, NULL, message);
+        }
 
         switch (type) {
         case PROGRAM:

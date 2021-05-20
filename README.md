@@ -1,4 +1,4 @@
 ### Dependencies
 - glfw
-- glad
 - spdlog
+- stb
