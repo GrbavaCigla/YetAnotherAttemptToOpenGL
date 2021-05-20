@@ -10,6 +10,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
+#define MSAA_SAMPLES 32
 
 // Vertices coordinates
 GLfloat vertices[] = {
@@ -34,9 +35,11 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, MSAA_SAMPLES);
 
     GLFWwindow *window =
         glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "CiglaGL", NULL, NULL);
+
     if (window == NULL) {
         spdlog::critical("Failed to create GLFW window.");
         glfwTerminate();
@@ -47,6 +50,7 @@ int main() {
 
     gladLoadGL();
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glEnable(GL_MULTISAMPLE);
 
     Shader shaderProgram(
         "../res/shaders/default.vert",
