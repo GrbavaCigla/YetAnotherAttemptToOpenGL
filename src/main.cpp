@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 
 #include <ciglagl/shader.h>
@@ -10,7 +11,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
-#define MSAA_SAMPLES 32
+#define MSAA_SAMPLES 16
 
 // Vertices coordinates
 GLfloat vertices[] = {
@@ -72,7 +73,12 @@ int main() {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         shaderProgram.Activate();
+
+        spdlog::level::level_enum cur_lvl = spdlog::get_level();
+        spdlog::set_level(spdlog::level::off);
         VAO1.Bind();
+        spdlog::set_level(cur_lvl);
+        
         glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
