@@ -3,10 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 
+#include <ciglagl/shader.h>
 #include <ciglagl/vao.h>
 #include <ciglagl/vbo.h>
 #include <ciglagl/ebo.h>
-#include <ciglagl/shader.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 800
@@ -48,26 +48,29 @@ int main() {
     gladLoadGL();
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    Shader shaderProgram("../res/shaders/default.vert", "../res/shaders/default.frag");
+    Shader shaderProgram(
+        "../res/shaders/default.vert",
+        "../res/shaders/default.frag"
+    );
 
-	VAO VAO1;
-	VAO1.Bind();
+    VAO VAO1;
+    VAO1.Bind();
 
-	VBO VBO1(vertices, sizeof(vertices));
-	EBO EBO1(indices, sizeof(indices));
+    VBO VBO1(vertices, sizeof(vertices));
+    EBO EBO1(indices, sizeof(indices));
 
-	VAO1.LinkVBO(VBO1, 0);
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
+    VAO1.LinkVBO(VBO1, 0);
+    VAO1.Unbind();
+    VBO1.Unbind();
+    EBO1.Unbind();
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		shaderProgram.Activate();
-		VAO1.Bind();
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
-		glfwSwapBuffers(window);
+        glClear(GL_COLOR_BUFFER_BIT);
+        shaderProgram.Activate();
+        VAO1.Bind();
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
