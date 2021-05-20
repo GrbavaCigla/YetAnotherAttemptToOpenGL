@@ -1,5 +1,7 @@
 #include <ciglagl/shader.h>
 
+#define COMPILE_ERROR_BUFFER_SIZE 1024
+
 std::string getFileContents(const std::string &filepath) {
     std::ifstream file(filepath, std::ios::binary);
 
@@ -17,61 +19,63 @@ std::string getFileContents(const std::string &filepath) {
     }
 }
 
-Shader::Shader(const std::string &vertex_filepath,
-               const std::string &fragment_filepath) {
+Shader::Shader(const std::string &vertexFilepath,
+               const std::string &fragmentFilepath) {
     spdlog::info("Opening vertex shader code.");
-    std::string vertex_shader_code = getFileContents(vertex_filepath);
+    std::string vertexShaderCode = getFileContents(vertexFilepath);
 
     spdlog::info("Opening fragment shader code.");
-    std::string fragment_shader_code = getFileContents(fragment_filepath);
+    std::string fragmentShaderCode = getFileContents(fragmentFilepath);
 
-    const char *vertex_shader_code_ptr = vertex_shader_code.c_str();
-    const char *fragment_shader_code_ptr = fragment_shader_code.c_str();
+    const char *pVertexShaderCode = vertexShaderCode.c_str();
+    const char *pFragmentShaderCode = fragmentShaderCode.c_str();
 
     spdlog::info("Compiling vertex shader source.");
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_code_ptr, NULL);
-    glCompileShader(vertex_shader);
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &pVertexShaderCode, NULL);
+    glCompileShader(vertexShader);
 
-    GLint vertex_compiled;
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertex_compiled);
-    if (vertex_compiled != GL_TRUE) {
-        GLsizei log_length = 0;
-        GLchar message[1024];
-        glGetShaderInfoLog(vertex_shader, 1024, &log_length, message);
+    GLint vertexCompiled;
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexCompiled);
+    if (vertexCompiled != GL_TRUE) {
+        GLsizei logLength = 0;
+        GLchar message[COMPILE_ERROR_BUFFER_SIZE];
+        glGetShaderInfoLog(vertexShader, COMPILE_ERROR_BUFFER_SIZE, &logLength,
+                           message);
         spdlog::error("Vertex shader compile error:\n{}", message);
     }
 
     spdlog::info("Compiling fragment shader source.");
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_code_ptr, NULL);
-    glCompileShader(fragment_shader);
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &pFragmentShaderCode, NULL);
+    glCompileShader(fragmentShader);
 
-    GLint fragment_compiled;
-    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragment_compiled);
-    if (fragment_compiled != GL_TRUE) {
-        GLsizei log_length = 0;
-        GLchar message[1024];
-        glGetShaderInfoLog(fragment_shader, 1024, &log_length, message);
+    GLint fragmentCompiled;
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragmentCompiled);
+    if (fragmentCompiled != GL_TRUE) {
+        GLsizei logLength = 0;
+        GLchar message[COMPILE_ERROR_BUFFER_SIZE];
+        glGetShaderInfoLog(fragmentShader, COMPILE_ERROR_BUFFER_SIZE,
+                           &logLength, message);
         spdlog::error("Fragment shader compile error:\n{}", message);
     }
 
     spdlog::info("Creating shader program.");
-    id = glCreateProgram();
+    ID = glCreateProgram();
 
     spdlog::info("Attaching shaders to shader program.");
-    glAttachShader(id, vertex_shader);
-    glAttachShader(id, fragment_shader);
-    glLinkProgram(id);
+    glAttachShader(ID, vertexShader);
+    glAttachShader(ID, fragmentShader);
+    glLinkProgram(ID);
 
     spdlog::info("Cleaning up shaders.");
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 }
 
 Shader::~Shader() {
     spdlog::info("Deleting shader program.");
-    glDeleteProgram(id);
+    glDeleteProgram(ID);
 }
 
-void Shader::activate() { glUseProgram(id); }
+void Shader::Activate() { glUseProgram(ID); }
