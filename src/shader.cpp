@@ -19,8 +19,7 @@ std::string getFileContents(const std::string &filepath) {
     }
 }
 
-Shader::Shader(const std::string &vertexFilepath,
-               const std::string &fragmentFilepath) {
+Shader::Shader(const std::string &vertexFilepath, const std::string &fragmentFilepath) {
     spdlog::info("Opening vertex shader code.");
     std::string vertexShaderCode = getFileContents(vertexFilepath);
 
@@ -34,31 +33,13 @@ Shader::Shader(const std::string &vertexFilepath,
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &pVertexShaderCode, NULL);
     glCompileShader(vertexShader);
-
-    GLint vertexCompiled;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexCompiled);
-    if (vertexCompiled != GL_TRUE) {
-        GLsizei logLength = 0;
-        GLchar message[COMPILE_ERROR_BUFFER_SIZE];
-        glGetShaderInfoLog(vertexShader, COMPILE_ERROR_BUFFER_SIZE, &logLength,
-                           message);
-        spdlog::error("Vertex shader compile error:\n{}", message);
-    }
+    CompileMessages(vertexShader, VERTEX);
 
     spdlog::info("Compiling fragment shader source.");
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &pFragmentShaderCode, NULL);
     glCompileShader(fragmentShader);
-
-    GLint fragmentCompiled;
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragmentCompiled);
-    if (fragmentCompiled != GL_TRUE) {
-        GLsizei logLength = 0;
-        GLchar message[COMPILE_ERROR_BUFFER_SIZE];
-        glGetShaderInfoLog(fragmentShader, COMPILE_ERROR_BUFFER_SIZE,
-                           &logLength, message);
-        spdlog::error("Fragment shader compile error:\n{}", message);
-    }
+    CompileMessages(fragmentShader, FRAGMENT);
 
     spdlog::info("Creating shader program.");
     ID = glCreateProgram();
@@ -67,6 +48,7 @@ Shader::Shader(const std::string &vertexFilepath,
     glAttachShader(ID, vertexShader);
     glAttachShader(ID, fragmentShader);
     glLinkProgram(ID);
+    CompileMessages(ID, PROGRAM);
 
     spdlog::info("Cleaning up shaders.");
     glDeleteShader(vertexShader);
@@ -79,3 +61,34 @@ Shader::~Shader() {
 }
 
 void Shader::Activate() { glUseProgram(ID); }
+
+void Shader::CompileMessages(GLuint shader, CompileType type) {
+    GLint compiled;
+
+    if (type == PROGRAM) {
+        glGetProgramiv(shader, GL_COMPILE_STATUS, &compiled);
+    } else {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+    }
+
+    if (compiled != GL_TRUE) {
+        GLsizei logLength = 0;
+        GLchar message[COMPILE_ERROR_BUFFER_SIZE];
+        if (type == PROGRAM)
+            glGetProgramInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, &logLength, message);
+        else
+            glGetShaderInfoLog(shader, COMPILE_ERROR_BUFFER_SIZE, &logLength, message);
+
+        switch (type) {
+        case PROGRAM:
+            spdlog::error("Program linking error:\n{}", message);
+            break;
+        case FRAGMENT:
+            spdlog::error("Fragment shader compiling error:\n{}", message);
+            break;
+        case VERTEX:
+            spdlog::error("Vertex shader compiling error:\n{}", message);
+            break;
+        }
+    }
+}
