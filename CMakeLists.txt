@@ -13,6 +13,7 @@ find_package(OpenGL REQUIRED)
 
 pkg_check_modules(GLFW REQUIRED glfw3)
 pkg_check_modules(SPDLOG REQUIRED spdlog)
+pkg_check_modules(GLM REQUIRED glm)
 
 add_compile_definitions(SPDLOG_FMT_EXTERNAL)
 add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
@@ -20,10 +21,11 @@ add_compile_definitions(STB_IMAGE_IMPLEMENTATION)
 include_directories(include)
 include_directories(${GLFW_INCLUDEDIR})
 include_directories(${SPDLOG_INCLUDEDIR})
+include_directories(${GLM_INCLUDEDIR})
 
 string(TOLOWER ${PROJECT_NAME} EXECUTABLE_NAME)
 add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES})
 
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(${EXECUTABLE_NAME} OpenGL::GL ${GLFW_LIBRARIES} ${CMAKE_DL_LIBS} ${SPDLOG_LIBRARIES})
+target_link_libraries(${EXECUTABLE_NAME} OpenGL::GL ${GLFW_LIBRARIES} ${GLM_LIBRARIES} ${CMAKE_DL_LIBS} ${SPDLOG_LIBRARIES})

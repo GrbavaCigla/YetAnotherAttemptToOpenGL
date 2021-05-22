@@ -1,4 +1,5 @@
 #include <ciglagl/texture.h>
+#include <stb/stb_image.h> // TODO: This is temporary, this should be in texture.h
 
 Texture::Texture(const std::string &imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType) {
     type = texType;
